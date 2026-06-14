@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dylangrow.github.io/pitch_perfect_26/sitemap.xml
