@@ -1,7 +1,7 @@
 import type { Match, Scorer, GroupStanding, DisciplineEntry } from '../types';
 
 const API_BASE = 'https://api.football-data.org/v4';
-const WC_2026_ID = 2000;
+const WC_2026_ID = 'WC'; // football-data.org competition code for FIFA World Cup (verified)
 const API_KEY: string = (import.meta as unknown as { env?: Record<string, string> }).env?.['VITE_FD_API_KEY'] ?? '';
 const HEADERS: HeadersInit = API_KEY ? { 'X-Auth-Token': API_KEY } : {};
 
