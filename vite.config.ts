@@ -31,7 +31,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\.football-data\.org\/.*/i,
+            urlPattern: /^https:\/\/corsproxy\.io\/.*/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'football-api-cache',
@@ -62,7 +62,7 @@ export default defineConfig({
     headers: {
       'Content-Security-Policy':
         "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
-        "img-src 'self' data:; connect-src 'self' https://api.football-data.org; " +
+        "img-src 'self' data:; connect-src 'self' https://corsproxy.io https://api.football-data.org; " +
         "font-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; " +
         "form-action 'self'; upgrade-insecure-requests",
       'X-Content-Type-Options': 'nosniff',
