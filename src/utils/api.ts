@@ -5,6 +5,15 @@ const WC_2026_ID = 'WC'; // football-data.org competition code for FIFA World Cu
 const API_KEY: string = (import.meta as unknown as { env?: Record<string, string> }).env?.['VITE_FD_API_KEY'] ?? '';
 const HEADERS: HeadersInit = API_KEY ? { 'X-Auth-Token': API_KEY } : {};
 
+// football-data.org locks CORS to a single registered origin (often localhost),
+// which blocks direct browser calls from GitHub Pages. Route through a CORS
+// proxy that forwards our custom X-Auth-Token header and adds the missing
+// Access-Control-Allow-Origin response header.
+const CORS_PROXY = 'https://corsproxy.io/?url=';
+function proxied(url: string): string {
+  return `${CORS_PROXY}${encodeURIComponent(url)}`;
+}
+
 export function sanitize(value: unknown): string {
   if (typeof value !== 'string') return '';
   const el = document.createElement('span');
@@ -42,7 +51,7 @@ interface RawMatch {
 
 export async function fetchMatches(): Promise<Match[]> {
   try {
-    const data = await safeFetch<{ matches: RawMatch[] }>(`${API_BASE}/competitions/${WC_2026_ID}/matches`);
+    const data = await safeFetch<{ matches: RawMatch[] }>(proxied(`${API_BASE}/competitions/${WC_2026_ID}/matches`));
     return (data.matches || []).map(m => ({
       id: m.id, utcDate: m.utcDate, status: m.status as Match['status'],
       matchday: m.matchday, stage: sanitize(m.stage), group: m.group ? sanitize(m.group) : null,
@@ -56,7 +65,7 @@ export async function fetchMatches(): Promise<Match[]> {
 
 export async function fetchScorers(): Promise<Scorer[]> {
   try {
-    const data = await safeFetch<{ scorers: { player: { id: number; name: string; nationality: string }; team: { id: number; name: string; tla: string }; goals: number; assists: number; penalties: number }[] }>(`${API_BASE}/competitions/${WC_2026_ID}/scorers?limit=20`);
+    const data = await safeFetch<{ scorers: { player: { id: number; name: string; nationality: string }; team: { id: number; name: string; tla: string }; goals: number; assists: number; penalties: number }[] }>(proxied(`${API_BASE}/competitions/${WC_2026_ID}/scorers?limit=20`));
     return (data.scorers || []).map(s => ({
       player: { id: s.player.id, name: sanitize(s.player.name), nationality: sanitize(s.player.nationality) },
       team: { id: s.team.id, name: sanitize(s.team.name), tla: sanitize(s.team.tla) },
@@ -67,7 +76,7 @@ export async function fetchScorers(): Promise<Scorer[]> {
 
 export async function fetchStandings(): Promise<GroupStanding[]> {
   try {
-    const data = await safeFetch<{ standings: GroupStanding[] }>(`${API_BASE}/competitions/${WC_2026_ID}/standings`);
+    const data = await safeFetch<{ standings: GroupStanding[] }>(proxied(`${API_BASE}/competitions/${WC_2026_ID}/standings`));
     return data.standings || [];
   } catch { return getMockStandings(); }
 }
